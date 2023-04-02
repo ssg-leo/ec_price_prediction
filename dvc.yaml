@@ -3,28 +3,49 @@ stages:
     cmd: python src/preprocess.py
     deps:
       - src/preprocess.py
-      - data/train.csv
-      - data/test.csv
+      - data/transactions.csv
+      - data/hdb-resale-price-index.csv
     outs:
-      - data/preprocessed
+      - data/clean_data.csv
+
+#  validate:
+#    cmd: python validate_data.py data.csv
+#    deps:
+#      - data.csv
+#      - validate_data.py
+#    outs:
+#      - validation_result.txt
+  eda:
+    cmd: python src/eda.py
+    deps:
+      - src/eda.py
+      - data/clean_data.csv
+    outs:
+      - data/pandas_profiling_report.html
 
   train:
     cmd: python src/train.py
     deps:
+      - data/clean_data.csv
       - src/train.py
-      - data/preprocessed
     outs:
-      - models/model.pkl
-    metrics:
-      - metrics/train_accuracy.json
-      - metrics/train_loss.json
+      - models/pipeline.pkl
 
-  evaluate:
-    cmd: python src/evaluate.py
+  optimize:
+    cmd: python src/optimize.py
     deps:
-      - src/evaluate.py
-      - models/model.pkl
-      - data/preprocessed
-    metrics:
-      - metrics/test_accuracy.json
-      - metrics/test_loss.json
+      - data/clean_data.csv
+      - src/optimize.py
+      - models/pipeline.pkl
+    outs:
+      - models/best_pipeline.pkl
+
+  interpret:
+    cmd: python src/interpret.py
+    deps:
+      - data/clean_data.csv
+      - src/interpret.py
+      - models/best_pipeline.pkl
+    outs:
+      - models/shap_summary_plot.png
+      - models/explainer.pkl
