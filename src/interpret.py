@@ -18,7 +18,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = pipeline.named_steps["model"]
 
 # Create a SHAP explainer
-explainer = shap.Explainer(model)
+explainer = shap.TreeExplainer(model)
 
 # Compute SHAP values for the test set
 shap_values = explainer(X_test)
