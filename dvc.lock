@@ -1,0 +1,60 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - path: data/hdb-resale-price-index.csv
+      md5: 039e3ad31e70306631040be148225e7e
+      size: 1879
+    - path: data/transactions.csv
+      md5: 80a6a68d69c8649461ac6e2fa855ac7f
+      size: 25851102
+    - path: src/preprocess.py
+      md5: fb7b998db9e7b322cd94e23ebbcca428
+      size: 5666
+    outs:
+    - path: data/clean_data.csv
+      md5: e6c6fdb8665def8ae380b4a58f0d40b4
+      size: 1463321
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/clean_data.csv
+      md5: e6c6fdb8665def8ae380b4a58f0d40b4
+      size: 1463321
+    - path: src/train.py
+      md5: ba5c921a59f92bc88243332557cd854d
+      size: 2570
+    outs:
+    - path: models/pipeline.pkl
+      md5: 3e96406b12d2cb005594a55a103b907d
+      size: 263604
+  eda:
+    cmd: python src/eda.py
+    deps:
+    - path: data/clean_data.csv
+      md5: e6c6fdb8665def8ae380b4a58f0d40b4
+      size: 1463321
+    - path: src/eda.py
+      md5: 948d4534762fdde178605693114db05f
+      size: 435
+    outs:
+    - path: data/pandas_profiling_report.html
+      md5: 5842a6abb6036e7dea224a5ea4332af7
+      size: 3280003
+  optimize:
+    cmd: python src/optimize.py
+    deps:
+    - path: data/clean_data.csv
+      md5: e6c6fdb8665def8ae380b4a58f0d40b4
+      size: 1463321
+    - path: models/pipeline.pkl
+      md5: 3e96406b12d2cb005594a55a103b907d
+      size: 263604
+    - path: src/optimize.py
+      md5: 4a3c73272abbed1caf7089914ecf2b20
+      size: 3740
+    outs:
+    - path: models/best_pipeline.pkl
+      md5: 591b6dce6d6dc34901ee5da7ae274c02
+      size: 1778230
