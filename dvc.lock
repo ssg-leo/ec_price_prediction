@@ -68,8 +68,8 @@ stages:
       md5: 13286bee33fe69ad6d6de977c07d9580
       size: 2367868
   run_experiment:
-    cmd: python src/run_experiment.py 0.09349609259346399 195 8 1 0.1496978138592608
-      0.8953269063432018 0.5404741863319118 0.82745268751237 0.556378544778802 gbtree
+    cmd: python src/run_experiment.py 0.06873357115231221 155 9 3 0.5 0.7485632025654929
+      0.8252374368807873 1.0 0.0 gbtree
     deps:
     - path: src/run_experiment.py
       md5: 84f545cd3cd93682fa6506df911c9baa
@@ -92,3 +92,22 @@ stages:
     - path: data/raw_data/transactions_4.txt
       md5: 28e9f5779ec4d9c0fc5887cb8b570e2b
       size: 4559074
+  interpret:
+    cmd: python src/interpret.py
+    deps:
+    - path: data/clean_data.csv
+      md5: aec402d38b8b620c2138063bf8d670c4
+      size: 1464113
+    - path: models/best_pipeline.pkl
+      md5: 13286bee33fe69ad6d6de977c07d9580
+      size: 2367868
+    - path: src/interpret.py
+      md5: f5ae5d3be3ff30f23d134cb463519a08
+      size: 1764
+    outs:
+    - path: models/explainer.pkl
+      md5: 7ad2d818f53c2731be639a43028e1110
+      size: 8625069
+    - path: models/shap_summary_plot.png
+      md5: 3275f3657e36538a9a462693a1c80bf0
+      size: 74521
