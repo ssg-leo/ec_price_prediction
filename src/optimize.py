@@ -66,13 +66,11 @@ bayes_opt = BayesSearchCV(
     scoring=mape_scorer
 )
 
-
 # Custom callback to print the evaluation metric during the optimization process
 def on_step(optim_result):
     score = -optim_result.fun
     print(f"Best MAPE: {score:.2f}%")
     return False
-
 
 # Run the Bayesian optimization with the custom callback
 bayes_opt.fit(X_train, y_train, callback=on_step)
@@ -80,8 +78,10 @@ bayes_opt.fit(X_train, y_train, callback=on_step)
 # Get the best hyperparameters
 best_params = bayes_opt.best_params_
 
-# Get the root directory of your project
-root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# Save the best model
+best_pipeline = bayes_opt.best_estimator_
+os.makedirs("models", exist_ok=True)
+joblib.dump(best_pipeline, "models/best_pipeline.pkl")
 
 # Call the DVC experiment with the best hyperparameters
 result = subprocess.run(
@@ -99,7 +99,7 @@ result = subprocess.run(
     ],
     capture_output=True,
     text=True,
-    cwd=root_dir
+    cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 )
 
 # Check if the experiment completed successfully
@@ -108,9 +108,3 @@ if result.returncode == 0:
 else:
     print("Experiment failed.")
     print(result.stderr)
-
-os.makedirs("models", exist_ok=True)
-
-# Save the best model
-best_pipeline = bayes_opt.best_estimator_
-joblib.dump(best_pipeline, "models/best_pipeline.pkl")

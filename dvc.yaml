@@ -40,12 +40,18 @@ stages:
     outs:
       - models/best_pipeline.pkl
 
-  interpret:
-    cmd: python src/interpret.py
+  run_experiment:
+    cmd: python src/run_experiment.py ${learning_rate} ${n_estimators} ${max_depth} ${min_child_weight} ${gamma} ${subsample} ${colsample_bytree} ${reg_alpha} ${reg_lambda} ${booster}
     deps:
-      - data/clean_data.csv
-      - src/interpret.py
-      - models/best_pipeline.pkl
-    outs:
-      - models/shap_summary_plot.png
-      - models/explainer.pkl
+      - src/run_experiment.py
+      - src/train.py
+
+#  interpret:
+#    cmd: python src/interpret.py
+#    deps:
+#      - data/clean_data.csv
+#      - src/interpret.py
+#      - models/best_pipeline.pkl
+#    outs:
+#      - models/shap_summary_plot.png
+#      - models/explainer.pkl
