@@ -1,9 +1,20 @@
 stages:
+  extract:
+    cmd: sh src/extract/extract_data.sh
+    outs:
+      - data/raw_data/transactions_1.txt
+      - data/raw_data/transactions_2.txt
+      - data/raw_data/transactions_3.txt
+      - data/raw_data/transactions_4.txt
+
   preprocess:
     cmd: python src/preprocess.py
     deps:
       - src/preprocess.py
-      - data/transactions.csv
+      - data/raw_data/transactions_1.txt
+      - data/raw_data/transactions_2.txt
+      - data/raw_data/transactions_3.txt
+      - data/raw_data/transactions_4.txt
       - data/hdb-resale-price-index.csv
     outs:
       - data/clean_data.csv
