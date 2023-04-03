@@ -6,6 +6,7 @@ stages:
       - data/raw_data/transactions_2.txt
       - data/raw_data/transactions_3.txt
       - data/raw_data/transactions_4.txt
+    always_changed: true
 
   preprocess:
     cmd: python src/preprocess.py
