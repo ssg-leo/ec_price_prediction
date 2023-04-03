@@ -1,6 +1,9 @@
 import pandas as pd
 import re
 from datetime import datetime
+import os
+import json
+import hashlib
 
 district_names = district_names = {
     1: 'Raffles Place, Cecil, Marina, People\'s Park',
@@ -123,8 +126,64 @@ def select_columns(df, columns_to_keep):
     output = df[columns_to_keep]
     return output
 
+def parse_raw():
+    """
+    Parse raw data from data/raw_data/* into a transactions.csv file
+    """
+    result_list = []
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(script_dir)
+    for file in os.listdir(os.path.join(root_dir, "data/raw_data")):
+        file_path =os.path.join(root_dir, "data/raw_data", file)
+        row_batch = []
+        if file.endswith(".txt"):
+            with open(file_path, "r") as f:
+                file_b = f.read()
+                file_json = json.loads(file_b)
+                result = file_json.get('Result')
+                for row in result:
+                    project_id = hashlib.md5(
+                        (row['street'] + row['project']).encode('utf-8')
+                        ).hexdigest()
+                    
+                    for transaction in row['transaction']:
+                        t_dict = dict()
+                        t_dict['transaction_id'] = hashlib.md5(
+                            (project_id + str(transaction['contractDate']) + str(transaction['area']) + str(transaction['price'])).encode('utf-8')
+                            ).hexdigest()
+                        t_dict['project_id'] = project_id
+                        t_dict['project'] = row['project']
+                        try:
+                            t_dict['x'] = row['x']
+                        except:
+                            t_dict['x'] = ''
+                        try:
+                            t_dict['y'] = row['y']
+                        except:
+                            t_dict['y'] = ''
+                        t_dict['street'] = row['street']
+                        t_dict['area'] = transaction['area']
+                        t_dict['floor_range'] = transaction['floorRange']
+                        t_dict['no_of_units'] = transaction['noOfUnits']
+                        t_dict['contract_date'] = str(transaction['contractDate'])
+                        t_dict['type_of_sale'] = transaction['typeOfSale']
+                        t_dict['price'] = transaction['price']
+                        t_dict['property_type'] = transaction['propertyType']
+                        t_dict['district'] = transaction['district']
+                        t_dict['type_of_area'] = transaction['typeOfArea']
+                        t_dict['tenure'] = transaction['tenure']
+
+                        row_batch.append(t_dict)
+                result_list += row_batch
+                print(f"Processed {file_path}")
+
+
+    df = pd.DataFrame(result_list)
+    df.to_csv(os.path.join(root_dir, "data/transactions.csv"), index=False)
+    print("Data processed to transactions.csv")
 
 if __name__ == "__main__":
+    parse_raw()
     data = pd.read_csv('data/transactions.csv')
     hdb_resale_price_index = pd.read_csv("data/hdb-resale-price-index.csv")
     processed_data = preprocess_transaction(data)
