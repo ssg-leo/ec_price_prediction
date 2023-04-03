@@ -51,7 +51,7 @@ param_space = {
     "model__colsample_bytree": Real(0.5, 1),
     "model__reg_alpha": Real(0, 1),
     "model__reg_lambda": Real(0, 1),
-    "model__booster": Categorical(["gbtree", "gblinear", "dart"])
+    "model__booster": Categorical(["gbtree"]) # Remove "gblinear" and "dart"
 }
 
 # Initialize the Bayesian optimization object

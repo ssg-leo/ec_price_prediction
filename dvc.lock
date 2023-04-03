@@ -61,12 +61,12 @@ stages:
       md5: b659f18db360caf361c7b559bd294ccb
       size: 266120
     - path: src/optimize.py
-      md5: 4b7e8fb6db1e5d08bd872da1ba4ab277
-      size: 3676
+      md5: 49dd273174f28605554a7baed7fdef28
+      size: 3687
     outs:
     - path: models/best_pipeline.pkl
-      md5: 19839e905cdbd66c7421070c3d1a982a
-      size: 2934124
+      md5: 13286bee33fe69ad6d6de977c07d9580
+      size: 2367868
   run_experiment:
     cmd: python src/run_experiment.py 0.09349609259346399 195 8 1 0.1496978138592608
       0.8953269063432018 0.5404741863319118 0.82745268751237 0.556378544778802 gbtree

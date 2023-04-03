@@ -58,12 +58,12 @@ stages:
       - src/run_experiment.py
       - src/train.py
 
-#  interpret:
-#    cmd: python src/interpret.py
-#    deps:
-#      - data/clean_data.csv
-#      - src/interpret.py
-#      - models/best_pipeline.pkl
-#    outs:
-#      - models/shap_summary_plot.png
-#      - models/explainer.pkl
+  interpret:
+    cmd: python src/interpret.py
+    deps:
+      - data/clean_data.csv
+      - src/interpret.py
+      - models/best_pipeline.pkl
+    outs:
+      - models/shap_summary_plot.png
+      - models/explainer.pkl
