@@ -6,58 +6,67 @@ stages:
     - path: data/hdb-resale-price-index.csv
       md5: 039e3ad31e70306631040be148225e7e
       size: 1879
-    - path: data/transactions.csv
-      md5: 80a6a68d69c8649461ac6e2fa855ac7f
-      size: 25851102
+    - path: data/raw_data/transactions_1.txt
+      md5: c031a9636b2ed7b16a84ae5b940d2295
+      size: 5179162
+    - path: data/raw_data/transactions_2.txt
+      md5: 398ed84e825fbb5b1d9ff3dd7e29ed49
+      size: 6766367
+    - path: data/raw_data/transactions_3.txt
+      md5: dade95074c3fb8601dc012415261a793
+      size: 11851110
+    - path: data/raw_data/transactions_4.txt
+      md5: 28e9f5779ec4d9c0fc5887cb8b570e2b
+      size: 4559074
     - path: src/preprocess.py
-      md5: fb7b998db9e7b322cd94e23ebbcca428
-      size: 5666
+      md5: 2bd6f380afb0417a27c2b89506cb09c9
+      size: 8379
     outs:
     - path: data/clean_data.csv
-      md5: e6c6fdb8665def8ae380b4a58f0d40b4
-      size: 1463321
+      md5: aec402d38b8b620c2138063bf8d670c4
+      size: 1464113
   train:
     cmd: python src/train.py
     deps:
     - path: data/clean_data.csv
-      md5: e6c6fdb8665def8ae380b4a58f0d40b4
-      size: 1463321
+      md5: aec402d38b8b620c2138063bf8d670c4
+      size: 1464113
     - path: src/train.py
       md5: ba5c921a59f92bc88243332557cd854d
       size: 2570
     outs:
     - path: models/pipeline.pkl
-      md5: 3e96406b12d2cb005594a55a103b907d
-      size: 263604
+      md5: b659f18db360caf361c7b559bd294ccb
+      size: 266120
   eda:
     cmd: python src/eda.py
     deps:
     - path: data/clean_data.csv
-      md5: e6c6fdb8665def8ae380b4a58f0d40b4
-      size: 1463321
+      md5: aec402d38b8b620c2138063bf8d670c4
+      size: 1464113
     - path: src/eda.py
       md5: 948d4534762fdde178605693114db05f
       size: 435
     outs:
     - path: data/pandas_profiling_report.html
-      md5: 5842a6abb6036e7dea224a5ea4332af7
-      size: 3280003
+      md5: ad3622881aae4bc8e3593e4c2973659a
+      size: 3279507
   optimize:
     cmd: python src/optimize.py
     deps:
     - path: data/clean_data.csv
-      md5: e6c6fdb8665def8ae380b4a58f0d40b4
-      size: 1463321
+      md5: aec402d38b8b620c2138063bf8d670c4
+      size: 1464113
     - path: models/pipeline.pkl
-      md5: 3e96406b12d2cb005594a55a103b907d
-      size: 263604
+      md5: b659f18db360caf361c7b559bd294ccb
+      size: 266120
     - path: src/optimize.py
       md5: 4b7e8fb6db1e5d08bd872da1ba4ab277
       size: 3676
     outs:
     - path: models/best_pipeline.pkl
-      md5: 591b6dce6d6dc34901ee5da7ae274c02
-      size: 1778230
+      md5: 19839e905cdbd66c7421070c3d1a982a
+      size: 2934124
   run_experiment:
     cmd: python src/run_experiment.py 0.09349609259346399 195 8 1 0.1496978138592608
       0.8953269063432018 0.5404741863319118 0.82745268751237 0.556378544778802 gbtree
@@ -68,3 +77,18 @@ stages:
     - path: src/train.py
       md5: ba5c921a59f92bc88243332557cd854d
       size: 2570
+  extract:
+    cmd: sh src/extract/extract_data.sh
+    outs:
+    - path: data/raw_data/transactions_1.txt
+      md5: c031a9636b2ed7b16a84ae5b940d2295
+      size: 5179162
+    - path: data/raw_data/transactions_2.txt
+      md5: 398ed84e825fbb5b1d9ff3dd7e29ed49
+      size: 6766367
+    - path: data/raw_data/transactions_3.txt
+      md5: dade95074c3fb8601dc012415261a793
+      size: 11851110
+    - path: data/raw_data/transactions_4.txt
+      md5: 28e9f5779ec4d9c0fc5887cb8b570e2b
+      size: 4559074

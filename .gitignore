@@ -131,3 +131,5 @@ dmypy.json
 data/*
 models/*
 .dvc/**
+
+.DS_Store
