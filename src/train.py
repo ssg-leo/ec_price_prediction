@@ -62,7 +62,7 @@ if __name__ == "__main__":
     pipeline.fit(X_train, y_train)
 
     # Save the model
-    joblib.dump(pipeline, "models/best_pipeline.pkl")
+    joblib.dump(pipeline, "models/pipeline.pkl")
 
     # Calculate the MAPE on the test set
     y_pred = pipeline.predict(X_test)

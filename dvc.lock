@@ -45,8 +45,8 @@ stages:
       md5: f9f858d3368c0c7b02a57b8d00f6f56c
       size: 1812
     - path: src/train.py
-      md5: d468ae6cd5f1fa541a9a307ac1eff9f8
-      size: 2575
+      md5: ba5c921a59f92bc88243332557cd854d
+      size: 2570
     params:
       params.yaml:
         train.booster: gbtree
@@ -98,3 +98,32 @@ stages:
     - path: models/shap_summary_plot.png
       md5: 808bf59a3ddeacb43db51eaad27fff24
       size: 72627
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/clean_data.csv
+      md5: f9c6b5c4af14d4b4ece4aeb401838b91
+      size: 1463478
+    - path: src/train.py
+      md5: ba5c921a59f92bc88243332557cd854d
+      size: 2570
+    outs:
+    - path: models/pipeline.pkl
+      md5: 525e359b461cee327c54b41afd861c4c
+      size: 262040
+  optimize:
+    cmd: python src/optimize.py
+    deps:
+    - path: data/clean_data.csv
+      md5: f9c6b5c4af14d4b4ece4aeb401838b91
+      size: 1463478
+    - path: models/pipeline.pkl
+      md5: 525e359b461cee327c54b41afd861c4c
+      size: 262040
+    - path: src/optimize.py
+      md5: 49dd273174f28605554a7baed7fdef28
+      size: 3687
+    outs:
+    - path: models/best_pipeline.pkl
+      md5: a6d8fc076dc2a33ee17822374b248a9d
+      size: 2705324
