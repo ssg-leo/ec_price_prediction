@@ -2,6 +2,11 @@ import subprocess
 import sys
 import os
 
+output_dir = "experiment_models"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+
 # Get the best hyperparameters from the command-line arguments
 best_params = {
     "learning_rate": float(sys.argv[1]),
