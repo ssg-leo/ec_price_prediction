@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 data/*
-models/*
+models/pipeline.pkl
 .dvc/**
 
 .DS_Store
