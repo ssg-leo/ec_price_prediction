@@ -12,7 +12,11 @@ def monitor_data_drift(reference_df, current_df):
     drift_report = Report(metrics=[DataDriftPreset(), TargetDriftPreset()])
     drift_report.run(reference_data=reference_df, current_data=current_df)
 
+    os.makedirs(os.path.join(root_dir, 'monitor'))
     drift_report.save_html(os.path.join(root_dir, 'monitor/drift.html'))
+
+def monitor_target_drift(reference_df, current_df):
+    pass
 
 if __name__ == "__main__":
     
