@@ -36,6 +36,8 @@ district_names = district_names = {
     28: 'Seletar'
 }
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(script_dir)
 
 def extract_built_year(tenure_str):
     """
@@ -131,8 +133,6 @@ def parse_raw():
     Parse raw data from data/raw_data/* into a transactions.csv file
     """
     result_list = []
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    root_dir = os.path.dirname(script_dir)
     for file in os.listdir(os.path.join(root_dir, "data/raw_data")):
         file_path =os.path.join(root_dir, "data/raw_data", file)
         row_batch = []
@@ -177,18 +177,54 @@ def parse_raw():
                 result_list += row_batch
                 print(f"Processed {file_path}")
 
-
     df = pd.DataFrame(result_list)
+    try:
+        existing_df = pd.read_csv(os.path.join(root_dir, "data/transactions.csv"))
+    except:
+        existing_df = pd.DataFrame(columns=['transaction_id','project_id','project','x','y','street','area','floor_range','no_of_units','contract_date','type_of_sale','price','property_type','district','type_of_area','tenure'])
+
+    diff = change_data_capture(df, existing_df)
+    
+    df = pd.concat([existing_df, diff])
+
     df.to_csv(os.path.join(root_dir, "data/transactions.csv"), index=False)
     print("Data processed to transactions.csv")
 
-if __name__ == "__main__":
-    parse_raw()
-    data = pd.read_csv('data/transactions.csv')
+def change_data_capture(df, existing_df):
+
+    merged = pd.merge(df, existing_df, on=['transaction_id'], how='left', indicator=True, suffixes=(None, '_y'))
+    # filter the merged dataframe to include only the rows present in the left dataframe but not the right dataframe
+    diff = merged[merged['_merge'] == 'left_only']
+    # filter the cols that ends with _y
+    keep_columns = [col for col in merged.columns if not (col.endswith('_y') or col.endswith('_merge'))]
+    diff = diff[keep_columns]
+    if not diff.empty:
+        print(f'Detected {len(diff)} new transactions...')
+        print('Saving new transactions to transactions_delta.csv and appending to transactions.csv')
+    else:
+        print('No change in extracted transactions vs our database')
+    diff.to_csv(os.path.join(root_dir, "data/transactions_delta.csv"), index=False)
+
+    return diff
+
+def final_process(df, output_name):
+    """
+    Merge data with hdb resale price index and select relevant columns
+    """
     hdb_resale_price_index = pd.read_csv("data/hdb-resale-price-index.csv")
-    processed_data = preprocess_transaction(data)
+    processed_data = preprocess_transaction(df)
     merged_df = merge_df(processed_data, hdb_resale_price_index)
     output_df = select_columns(merged_df, columns_to_keep=["x", "y", "area", "floor_range", "type_of_sale", "district",
                                                            "district_name", "remaining_lease", "index", "psm"])
     output_df = output_df.rename(columns={'index': 'price_index'})
-    output_df.to_csv("data/clean_data.csv", index=False)
+    output_df.to_csv(f"data/{output_name}", index=False)
+    
+
+if __name__ == "__main__":
+    parse_raw()
+    data = pd.read_csv('data/transactions.csv')
+    final_process(data, 'clean_data.csv')
+
+    #Process change data as well
+    change_data = pd.read_csv('data/transactions_delta.csv')
+    final_process(change_data, 'clean_data_delta.csv')
