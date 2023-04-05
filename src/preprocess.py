@@ -64,23 +64,27 @@ def preprocess_transaction(data):
         pandas.DataFrame: A pandas DataFrame containing preprocessed transaction data for Executive Condominiums.
     """
     executive_condos = data[data['property_type'] == 'Executive Condominium'].copy()
-    executive_condos['contract_date'] = pd.to_datetime(executive_condos['contract_date'], format='%m%y')
-    executive_condos['built_year'] = executive_condos['tenure'].apply(extract_built_year)
+    if not executive_condos.empty:
+        executive_condos['contract_date'] = pd.to_datetime(executive_condos['contract_date'], format='%m%y')
+        executive_condos['built_year'] = executive_condos['tenure'].apply(extract_built_year)
 
-    executive_condos['built_year'] = pd.to_datetime(executive_condos['built_year'], format='%Y', errors='coerce')
-    executive_condos['contract_date'] = pd.to_datetime(executive_condos['contract_date'], format='%m%y',
-                                                       errors='coerce')
-    executive_condos['age_at_sale'] = (executive_condos['contract_date'] - executive_condos['built_year']).dt.days / 365
-    executive_condos['remaining_lease'] = 99 - executive_condos['age_at_sale']
-    executive_condos['type_of_sale'] = executive_condos['type_of_sale'].replace({
-        1: 'New Sale',
-        2: 'Sub Sale',
-        3: 'Resale'
-    })
-    executive_condos['district_name'] = data['district'].map(district_names)
-    executive_condos['psm'] = executive_condos['price'] / executive_condos['area']
+        executive_condos['built_year'] = pd.to_datetime(executive_condos['built_year'], format='%Y', errors='coerce')
+        executive_condos['contract_date'] = pd.to_datetime(executive_condos['contract_date'], format='%m%y',
+                                                        errors='coerce')
+        executive_condos['age_at_sale'] = (executive_condos['contract_date'] - executive_condos['built_year']).dt.days / 365
+        executive_condos['remaining_lease'] = 99 - executive_condos['age_at_sale']
+        executive_condos['type_of_sale'] = executive_condos['type_of_sale'].replace({
+            1: 'New Sale',
+            2: 'Sub Sale',
+            3: 'Resale'
+        })
+        executive_condos['district_name'] = data['district'].map(district_names)
+        executive_condos['psm'] = executive_condos['price'] / executive_condos['area']
 
-    return executive_condos
+        return executive_condos
+    
+    else:
+        None
 
 
 def merge_df(transaction_data, hdb_resale_price_index):
@@ -213,10 +217,14 @@ def final_process(df, output_name):
     """
     hdb_resale_price_index = pd.read_csv("data/hdb-resale-price-index.csv")
     processed_data = preprocess_transaction(df)
-    merged_df = merge_df(processed_data, hdb_resale_price_index)
-    output_df = select_columns(merged_df, columns_to_keep=["x", "y", "area", "floor_range", "type_of_sale", "district",
-                                                           "district_name", "remaining_lease", "index", "psm"])
-    output_df = output_df.rename(columns={'index': 'price_index'})
+    if processed_data is not None:
+        merged_df = merge_df(processed_data, hdb_resale_price_index)
+        output_df = select_columns(merged_df, columns_to_keep=["x", "y", "area", "floor_range", "type_of_sale", "district",
+                                                            "district_name", "remaining_lease", "index", "psm"])
+        output_df = output_df.rename(columns={'index': 'price_index'})
+    else:
+        output_df = pd.DataFrame(columns=["x", "y", "area", "floor_range", "type_of_sale", "district",
+                                                            "district_name", "remaining_lease", "index", "psm"])
     output_df.to_csv(f"data/{output_name}", index=False)
     
 
