@@ -12,7 +12,8 @@ def monitor_data_drift(reference_df, current_df):
     drift_report = Report(metrics=[DataDriftPreset(), TargetDriftPreset()])
     drift_report.run(reference_data=reference_df, current_data=current_df)
 
-    os.makedirs(os.path.join(root_dir, 'monitor'))
+    if not os.path.exists(os.path.join(root_dir, 'monitor')):
+        os.makedirs(os.path.join(root_dir, 'monitor'))
     drift_report.save_html(os.path.join(root_dir, 'monitor/data_drift.html'))
 
 def monitor_target_drift(reference_df, current_df):
@@ -23,6 +24,12 @@ if __name__ == "__main__":
     #Load reference df and current df
     reference_df = pd.read_csv(os.path.join(root_dir, 'data/clean_data.csv'))
     change_df = pd.read_csv(os.path.join(root_dir, 'data/clean_data_delta.csv'))
+    target_cols = ['psm']
+
+    #Split df to the inputs and target cols
+    keep_columns = [col for col in reference_df.columns if not col in target_cols]
+    reference_df = reference_df[keep_columns]
+    change_df = change_df[keep_columns]
 
     if change_df.empty:
         print("No change in data, skipping monitoring...")

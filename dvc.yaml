@@ -73,3 +73,11 @@ stages:
     outs:
       - models/shap_summary_plot.png
       - models/explainer.pkl
+
+  monitor:
+    cmd: python src/monitor.py
+    deps:
+      - data/clean_data.csv
+      - src/monitor.py
+    outs:
+      - monitor/data_drift.html
