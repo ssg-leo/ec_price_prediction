@@ -13,3 +13,4 @@ joblib==1.2.0
 great_expectations==0.16.5
 pandas-profiling==3.6.6
 matplotlib==3.6.3
+evidently==0.2.8

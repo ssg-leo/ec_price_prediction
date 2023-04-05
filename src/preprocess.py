@@ -207,14 +207,24 @@ def change_data_capture(df, existing_df):
 
     return diff
 
-
-if __name__ == "__main__":
-    parse_raw()
-    data = pd.read_csv('data/transactions.csv')
+def final_process(df, output_name):
+    """
+    Merge data with hdb resale price index and select relevant columns
+    """
     hdb_resale_price_index = pd.read_csv("data/hdb-resale-price-index.csv")
-    processed_data = preprocess_transaction(data)
+    processed_data = preprocess_transaction(df)
     merged_df = merge_df(processed_data, hdb_resale_price_index)
     output_df = select_columns(merged_df, columns_to_keep=["x", "y", "area", "floor_range", "type_of_sale", "district",
                                                            "district_name", "remaining_lease", "index", "psm"])
     output_df = output_df.rename(columns={'index': 'price_index'})
-    output_df.to_csv("data/clean_data.csv", index=False)
+    output_df.to_csv(f"data/{output_name}", index=False)
+    
+
+if __name__ == "__main__":
+    parse_raw()
+    data = pd.read_csv('data/transactions.csv')
+    final_process(data, 'clean_data.csv')
+
+    #Process change data as well
+    change_data = pd.read_csv('data/transactions_delta.csv')
+    final_process(change_data, 'clean_data_delta.csv')
